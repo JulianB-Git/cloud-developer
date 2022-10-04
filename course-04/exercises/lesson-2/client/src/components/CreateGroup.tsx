@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { Form, Button } from 'semantic-ui-react'
 import { createGroup } from '../api/groups-api'
+import Auth from '../auth/Auth'
 
-interface CreateGroupProps {}
+interface CreateGroupProps {
+  auth: Auth
+}
 
 interface CreateGroupState {
   name: string
@@ -38,7 +41,7 @@ export class CreateGroup extends React.PureComponent<
       }
 
       this.setUploadState(true)
-      const group = await createGroup({
+      const group = await createGroup(this.props.auth.getIdToken(), {
         name: this.state.name,
         description: this.state.description
       })
@@ -46,8 +49,13 @@ export class CreateGroup extends React.PureComponent<
       console.log('Created description', group)
 
       alert('Group was created!')
-    } catch (e) {
-      alert('Could not upload an image: ' + e.message)
+    } catch (e: unknown) {
+      if (typeof e === "string") {
+        e.toUpperCase() // works, `e` narrowed to string
+      } else if (e instanceof Error) {
+          alert('Could not upload an image: ' + e.message)
+      }
+      
     } finally {
       this.setUploadState(false)
     }

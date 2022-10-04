@@ -24,12 +24,10 @@ import fs from "fs";
       }
 
       const filePath = await filterImageFromURL(image_url);
-      let localFiles: string[] = [filePath];
+
       
       res.status(200).sendFile(filePath);
-      req.on('close', () => {
-        deleteLocalFiles(localFiles);
-      })
+      req.on('close', () => deleteLocalFiles([filePath]));
     } catch(error) {
       return res.status(500).send({ message: 'ERROR: Something went wrong, request Failed' });
     }
